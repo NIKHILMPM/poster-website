@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/main.css">
+    <title>Backend Page</title>
+</head>
+
+<body>
+    <h1>Admin Panel</h1>
+    <% if(locals.users.length> 0) { %>
+        <table>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Password</th>
+                <th>Action</th>
+            </tr>
+            <% users.forEach((user)=> { %>
+                <tr>
+                    <td>
+                        <%= user.username %>
+                    </td>
+                    <td>
+                        <%= user.email %>
+                    </td>
+                    <td>
+                        <%= user.password %>
+                    </td>
+                    <td>
+                        <form action="/deleteUser" method="post">
+                            <input type="hidden" name="id" value="<%= user.id %>">
+                            <button type="submit">Delete User</button>
+                        </form>
+                    </td>
+                </tr>
+                <% }) %>
+        </table>
+        <% } else { %>
+            <h2>No users found in the database</h2>
+            <% } %>
+                <!-- ...................................................... -->
+                <hr>
+
+                <% if(locals.orders.length> 0) { %>
+                    <h2>Order</h2>
+                    <table>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>User Email</th>
+                            <th>Order Name</th>
+                            <th>Date</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>order cancellations</th>
+                            <th>Deny order</th>
+                            <th>Send order</th>
+
+
+                        </tr>
+                        <% orders.forEach((order)=> { %>
+                            <tr>
+                                <td>
+                                    <%= order.id %>
+                                </td>
+                                <td>
+                                    <%= order.email %>
+                                </td>
+                                <td>
+                                    <%= order.title %>
+                                </td>
+                                <td>
+                                    <%= order.date.getDate() %>
+                                </td>
+                                <td>
+                                    <%= order.price %>
+                                </td>
+                                <td>
+                                    <%= order.quantity %>
+                                </td>
+                                <%if(order.status){%>
+                                    <td class="yodo">
+                                        <form action="/approveCancel" method="post">
+                                            <input type="hidden" name="uid" value="<%= order.uid %>">
+                                            <input type="hidden" name="id" value="<%= order.id %>">
+                                            <input type="hidden" name="quantity" value="<%= order.quantity %>">
+                                            <input type="hidden" name="pid" value="<%= order.pid %>">
+                                            <input type="hidden" name="price" value="<%= order.price %>">
+                                            <button type="submit">Approve Cancellation</button>
+                                        </form>
+
+                                        <form action="/denyCancel" method="post">
+                                            <input type="hidden" name="id" value="<%= order.id %>">
+                                            <input type="hidden" name="uid" value="<%= order.uid %>">
+                                            <button type="submit">Deny Cancellation</button>
+                                        </form>
+
+                                    </td>
+                                    <% }else{ %>
+                                        <td>
+                                            <p>no cancellations</p>
+                                        </td>
+                                        <%}%>
+                                            <td>
+                                                <form action="/denyOrder" method="post">
+                                                    <input type="hidden" name="uid" value="<%= order.uid %>">
+                                                    <input type="hidden" name="id" value="<%= order.id %>">
+                                                    <input type="hidden" name="quantity" value="<%= order.quantity %>">
+                                                    <input type="hidden" name="pid" value="<%= order.pid %>">
+                                                    <input type="hidden" name="price" value="<%= order.price %>">
+                                                    <button type="submit">Deny order</button>
+                                                </form>
+                                            </td>
+                                            <td>
+                                                <form action="/sendOrder" method="post">
+                                                    <input type="hidden" name="uid" value="<%= order.uid %>">
+                                                    <input type="hidden" name="id" value="<%= order.id %>">
+                                                    <input type="hidden" name="pid" value="<%= order.pid %>">
+                                                    <input type="hidden" name="quantity" value="<%= order.quantity %>">
+                                                    <input type="hidden" name="price" value="<%= order.price %>">
+                                                    <button type="submit">send order</button>
+                                                </form>
+                                            </td>
+                            </tr>
+                            <% }) %>
+                    </table>
+                    <% } else { %>
+                        <h2>No orders found</h2>
+                        <% } %>
+                            <hr>
+                            <!-- .......................................... -->
+                            <% if (locals.posters.length> 0) { %>
+                                <span id="view">view inventory</span>
+                                <div id="inventory" >
+                                    <table id="posterInventory" class="notVisible">
+                                        <tr>
+                                            <th>poster</th>
+                                            <th>current quantity</th>
+                                            <th>change quantity to</th>
+                                            <th>delete poster</th>
+                                        </tr>
+                                        <% posters.map((poster)=> { %>
+                                            <tr>
+                                                <td>
+                                                    <%= poster.title %>
+                                                </td>
+                                                <td>
+                                                    <%= poster.quantity %>
+                                                </td>
+                                                <td>
+                                                    change quantity to <form action="/changeQuantity" method="post">
+                                                        <input style="width: 15px;" type="text" name="newQuantity"
+                                                            required>
+                                                        <input type="hidden" name="pid" value="<%= poster.id %>">
+                                                        <button type="submit">Change</button>
+
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form action="/deletePoster" method="post">
+                                                        <input type="hidden" name="pid" value="<%= poster.id %>">
+                                                        <button type="submit">DELETE</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </table>
+                                </div>
+                                <% } else { %>
+                                    <h2>Inventory is empty</h2>
+                                    <% } %>
+
+                                        <script>
+                                            document.getElementById('view').addEventListener("click", function () {
+                                                var inventory = document.getElementById("posterInventory");
+                                                inventory.classList.toggle("notVisible");
+                                                var viewButton = document.getElementById('view');
+                                                if (inventory.classList.contains("notVisible")) {
+                                                    viewButton.innerHTML = "Show Inventory";
+                                                } else {
+                                                    viewButton.innerHTML = "Hide Inventory";
+                                                }
+                                            });
+                                        </script>
+
+</body>
+
+</html>
